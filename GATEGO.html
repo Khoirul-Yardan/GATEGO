@@ -221,6 +221,7 @@
                 <label class="label">Catatan Pemeriksaan Fisik</label>
                 <textarea id="op-note" placeholder="Contoh: Segel sesuai, barang aman."></textarea>
                 <button id="op-submit" class="btn ok">Selesaikan Pemeriksaan</button>
+                <button id="op-reject" class="btn err" style="margin-top:8px;">Barang Tidak Sesuai (Tolak)</button>
             </div>
             </div>
         </div>
@@ -492,28 +493,30 @@ $('#btn-simulate-arrival').addEventListener('click', () => {
     renderAll();
 });
 
+// Dummy database untuk validasi OCR
+const DB_CONTAINERS = [
+    { number: "MSCU 123456 7", truck: "B 1234 XYZ" },
+    // Tambahkan data lain sesuai kebutuhan
+];
+
+// Fungsi validasi OCR
+function isOcrValid(container) {
+    return DB_CONTAINERS.some(db =>
+        db.number === container.number && db.truck === container.truck
+    );
+}
+
+// Modifikasi approveGate1 agar otomatis lolos jika OCR valid
 window.approveGate1 = (id) => {
     const items = getItems();
     const item = items.find(it => it.id === id);
     if (!item) return;
-    item.status = 'approved_for_gate2';
-    item.log.push({ time: new Date().toISOString(), message: "Validasi Admin OK. Menunggu Gate 2." });
-    setItems(items);
-    renderAll();
-};
-
-window.simulateGate2Entry = (id) => {
-    const items = getItems();
-    const item = items.find(it => it.id === id);
-    if (!item) return;
-    const mismatch = Math.random() < 0.1; // 10% chance mismatch
-    if (mismatch) {
-        item.status = 'mismatch_at_gate2';
-        item.errorNote = "Data verifikasi Gate 2 tidak cocok dengan sistem.";
-        item.log.push({ time: new Date().toISOString(), message: "ERROR: Mismatch terdeteksi di Gate 2." });
+    if (isOcrValid(item)) {
+        item.status = 'completed';
+        item.log.push({ time: new Date().toISOString(), message: "OCR valid, semua tahap lolos. Siap kirim/ambil." });
     } else {
-        item.status = 'awaiting_physical_check';
-        item.log.push({ time: new Date().toISOString(), message: "Lolos verifikasi Gate 2. Masuk yard." });
+        item.status = 'approved_for_gate2';
+        item.log.push({ time: new Date().toISOString(), message: "Validasi Admin OK. Menunggu Gate 2." });
     }
     setItems(items);
     renderAll();
@@ -554,6 +557,19 @@ $('#op-submit').addEventListener('click', () => {
     renderAll();
 });
 
+$('#op-reject').addEventListener('click', () => {
+    if (!currentOperatorPick) return;
+    const items = getItems();
+    const item = items.find(it => it.id === currentOperatorPick);
+    item.status = 'rejected';
+    item.physicalNote = $('#op-note').value || "Barang tidak sesuai, akses ditolak.";
+    item.log.push({ time: new Date().toISOString(), message: "Pemeriksaan fisik: Barang tidak sesuai, akses ditolak.", note: item.physicalNote });
+    setItems(items);
+    currentOperatorPick = null;
+    $('#operator-form').classList.add('hide');
+    renderAll();
+});
+
 /* ===================== RENDER TABLES ===================== */
 function renderAdminTables() {
     const items = getItems();
@@ -578,6 +594,9 @@ function renderAdminTables() {
                 break;
             case 'completed':
                  q3.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td><span class="badge ok">Selesai</span></td><td>${fmtIDR(it.totalTax)}</td></tr>`;
+                break;
+            case 'rejected':
+                q3.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td><span class="badge err">Ditolak</span></td><td>-</td></tr>`;
                 break;
         }
     });

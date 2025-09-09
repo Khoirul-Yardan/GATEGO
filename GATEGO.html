@@ -72,568 +72,255 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar" role="tablist" aria-label="Navigasi">
-    <div class="brand">
-      <div class="logo">G</div>
-      <div>
-        <div>GateGo Suite v3</div>
-        <div class="muted mini">Alur Dua Gerbang & Kamera Aktif</div>
-      </div>
+  <div class="topbar">
+    <span class="brand"><span class="logo">G</span> Admin Pelabuhan</span>
+    <button id="btn-logout" class="btn ghost">Logout</button>
+  </div>
+
+  <div class="content grid g-2">
+    <!-- Kamera Gate OCR -->
+    <div class="card">
+      <h3>Kamera Gate OCR</h3>
+      <video id="admin-camera-feed-1" class="inline-camera-view" autoplay muted playsinline></video>
+      <div id="admin-camera-status-1" class="muted">Offline</div>
     </div>
-    <nav class="tabs">
-      <button id="tab-login" class="tab-btn" aria-selected="true" data-target="#login">Login</button>
-      <button id="tab-admin" class="tab-btn" aria-selected="false" data-target="#admin" disabled>Admin Dashboard</button>
-      <button id="tab-operator" class="tab-btn" aria-selected="false" data-target="#operator" disabled>Operator Lapangan</button>
-      <button id="btn-logout" class="tab-btn" aria-selected="false" title="Keluar">Logout</button>
-    </nav>
+    <!-- Kamera Gate Utama -->
+    <div class="card">
+      <h3>Kamera Gate Utama</h3>
+      <video id="admin-camera-feed-2" class="inline-camera-view" autoplay muted playsinline></video>
+      <div id="admin-camera-status-2" class="muted">Offline</div>
+    </div>
   </div>
 
   <div class="content">
-
-    <section id="login" class="panel">
-      <div class="login-wrap card">
-        <h3>Masuk Akun</h3>
-        <div class="rows">
-          <label class="label">Pilih Peran (Demo)</label>
-          <div class="role-chip" role="group" aria-label="Pilih peran">
-            <button class="chip" data-role="admin" aria-pressed="false">Admin</button>
-            <button class="chip" data-role="operator" aria-pressed="false">Operator</button>
-          </div>
-          <button id="btn-login" class="btn" style="margin-top:6px">Masuk</button>
+    <div class="card">
+      <h3>Simulasi Kedatangan Truk</h3>
+      <div class="toolbar">
+        <button id="btn-simulate-ocr-valid" class="btn ok">Simulasi OCR Valid</button>
+        <button id="btn-simulate-ocr-invalid" class="btn warn">Simulasi OCR Tidak Valid</button>
+      </div>
+      <div id="barcode-modal" class="card hide" style="position:fixed; left:0; top:0; right:0; margin:auto; max-width:400px; z-index:99; background:#fff;">
+        <h4>Scan Barcode Surat Jalan</h4>
+        <input id="barcode-input" class="input" placeholder="Masukkan kode barcode..." />
+        <div class="toolbar">
+          <button id="btn-barcode-validate" class="btn ok">Validasi</button>
+          <button id="btn-barcode-cancel" class="btn err">Batal</button>
         </div>
       </div>
-    </section>
+    </div>
 
-    <section id="admin" class="panel hide" aria-labelledby="tab-admin">
-      <div class="grid g-3" style="margin-bottom: 16px;">
-        <div class="card">
-            <h3>Monitoring Gate 1 (OCR)</h3>
-            <div class="inline-camera-view">
-                <video id="admin-camera-feed-1" autoplay playsinline muted></video>
-                <div id="admin-camera-status-1" class="status">Menghubungkan...</div>
-            </div>
-        </div>
-        <div class="card">
-            <h3>Monitoring Gate 2 (Entry)</h3>
-            <div class="inline-camera-view">
-                <video id="admin-camera-feed-2" autoplay playsinline muted></video>
-                <div id="admin-camera-status-2" class="status">Menghubungkan...</div>
-            </div>
-        </div>
-        <div class="card rows" style="justify-content: center;">
-            <h3>Simulasi Sistem</h3>
-            <p class="muted mini">Tekan tombol di bawah untuk mensimulasikan data baru yang masuk dari Gate 1 (seolah-olah terdeteksi oleh kamera OCR).</p>
-            <button id="btn-simulate-arrival" class="btn warn">Simulasi Kedatangan Gate 1</button>
-        </div>
+    <div class="card">
+      <h3>Data Truk/Kontainer & Status Proses</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>No. Kontainer</th>
+              <th>No. Polisi Truk</th>
+              <th>Status</th>
+              <th>Aksi</th>
+              <th>Log & Pajak</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body"></tbody>
+        </table>
       </div>
-
-      <div class="card" style="margin-bottom: 16px;">
-        <h3>Input Manual Kontainer (Pra-Registrasi / Koreksi)</h3>
-        <p class="muted mini">Gunakan form ini untuk pra-registrasi atau jika simulasi OCR tidak digunakan. Untuk LCL, tambahkan beberapa item barang.</p>
-        <div class="rows">
-          <div class="cols">
-            <div>
-              <label class="label">No. Kontainer</label>
-              <input id="f-container-num" class="input" placeholder="TGHU 123456 7" />
-            </div>
-            <div>
-              <label class="label">No. Polisi Truk</label>
-              <input id="f-truck-num" class="input" placeholder="B 1234 XYZ" />
-            </div>
-          </div>
-          <div>
-            <label class="label"><input type="checkbox" id="f-npwp" checked> Punya NPWP (mempengaruhi PPh)</label>
-          </div>
-
-          <div class="card" style="background: #fdfdfd;">
-            <h4>Line Item Barang</h4>
-            <div class="rows">
-                <div id="line-item-list">
-                    </div>
-                <button id="btn-add-line-item" class="btn ghost small" style="max-width: 150px;">+ Tambah Barang</button>
-            </div>
-          </div>
-          <button id="btn-save-container" class="btn ok">Simpan Kontainer ke Antrian</button>
-        </div>
-      </div>
-
-      <div class="grid g-3">
-        <div class="card">
-          <h3>Tahap 1: Antrian Validasi Gate 1</h3>
-          <p class="muted mini">Data masuk dari OCR Gate. Admin harus memvalidasi data ini sebelum truk diizinkan ke Gate 2.</p>
-          <div class="table-wrap">
-            <table id="tbl-gate1-queue">
-              <thead><tr><th>Kontainer</th><th>Truk</th><th>Items</th><th>Aksi</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Tahap 2: Antrian Masuk Gate 2</h3>
-          <p class="muted mini">Data tervalidasi. Menunggu truk tiba di Gate 2 untuk verifikasi final. Klik 'Simulasi' untuk memproses kedatangan.</p>
-          <div class="table-wrap">
-            <table id="tbl-gate2-queue">
-              <thead><tr><th>Kontainer</th><th>Truk</th><th>Items</th><th>Aksi</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Tahap 3: Menunggu Cek Fisik Operator</h3>
-          <p class="muted mini">Kontainer lolos Gate 2. Menunggu pemeriksaan fisik oleh operator di lapangan (jika diperlukan).</p>
-           <div class="table-wrap">
-            <table id="tbl-physical-check">
-              <thead><tr><th>Kontainer</th><th>Truk</th><th>Status Cek</th><th>Pajak Total</th></tr></thead>
-              <tbody></tbody>
-            </table>
-           </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="operator" class="panel hide" aria-labelledby="tab-operator">
-        <div class="grid g-2">
-            <div class="card">
-            <h3>Perhatian: Mismatch di Gate 2</h3>
-            <p class="muted mini">Kontainer berikut terdeteksi mismatch di Gate 2. Segera dekati supir dan scan QR Code surat jalan untuk verifikasi.</p>
-            <div class="table-wrap">
-                <table id="tbl-mismatch">
-                <thead><tr><th>Kontainer</th><th>Truk</th><th>Catatan Error</th><th>Aksi</th></tr></thead>
-                <tbody></tbody>
-                </table>
-            </div>
-            </div>
-
-            <div class="card">
-            <h3>Tugas Cek Fisik</h3>
-            <p class="muted mini">Kontainer yang perlu pemeriksaan detail setelah lolos gerbang.</p>
-            <div class="table-wrap">
-                <table id="tbl-operator-check">
-                <thead><tr><th>Kontainer</th><th>Truk</th><th>Aksi</th></tr></thead>
-                <tbody></tbody>
-                </table>
-            </div>
-            <div class="rows hide" id="operator-form" style="margin-top: 15px;">
-                <label class="label">Kontainer Terpilih</label>
-                <input id="op-picked" class="input" readonly />
-                <label class="label">Catatan Pemeriksaan Fisik</label>
-                <textarea id="op-note" placeholder="Contoh: Segel sesuai, barang aman."></textarea>
-                <button id="op-submit" class="btn ok">Selesaikan Pemeriksaan</button>
-                <button id="op-reject" class="btn err" style="margin-top:8px;">Barang Tidak Sesuai (Tolak)</button>
-            </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="foot">© 2025 Mockup V3 - Alur Dua Gerbang.</div>
+    </div>
+  </div>
 </div>
 
 <script>
-/* ===================== UTIL & STATE ===================== */
-const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const fmtIDR = v => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(v || 0));
-const uid = () => 'ID' + Math.random().toString(36).slice(2, 9);
+// Helper selector
+function $(sel) {
+  return document.querySelector(sel);
+}
 
-const KEYS = { items: 'gatego_v3_items', role: 'gatego_v3_role' };
+// Dummy database kontainer valid
+const DB_CONTAINERS = [
+  { number: "MSCU 123456 7", truck: "B 1234 XYZ" },
+  { number: "TGHU 987654 3", truck: "D 5678 ABC" }
+];
+
+const KEYS = { items: 'gatego_v4_items' };
 const getItems = () => JSON.parse(localStorage.getItem(KEYS.items) || '[]');
 const setItems = v => localStorage.setItem(KEYS.items, JSON.stringify(v));
 
-/* ===================== CAMERA MANAGEMENT (NEW) ===================== */
-let adminVideoStream = null;
-
-async function startAdminCameras() {
-    if (adminVideoStream) return; // Already running
-
-    const video1 = $('#admin-camera-feed-1');
-    const video2 = $('#admin-camera-feed-2');
-    const status1 = $('#admin-camera-status-1');
-    const status2 = $('#admin-camera-status-2');
-
-    try {
-        adminVideoStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (video1) video1.srcObject = adminVideoStream;
-        if (video2) video2.srcObject = adminVideoStream; // Use same stream for both views in demo
-
-        if (status1) {
-            status1.textContent = 'Gate 1 Live';
-            status1.style.color = 'var(--ok)';
-        }
-        if (status2) {
-            status2.textContent = 'Gate 2 Live';
-            status2.style.color = 'var(--ok)';
-        }
-    } catch (err) {
-        console.error("Camera access error:", err);
-        if (status1) {
-            status1.textContent = 'Camera Failed';
-            status1.style.color = 'var(--err)';
-        }
-        if (status2) {
-            status2.textContent = 'Camera Failed';
-            status2.style.color = 'var(--err)';
-        }
-    }
+// Simulasi kamera (dummy)
+function startAdminCameras() {
+  $('#admin-camera-status-1').textContent = 'Online';
+  $('#admin-camera-status-2').textContent = 'Online';
+  // Realtime webcam untuk demo
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+      $('#admin-camera-feed-1').srcObject = stream;
+      $('#admin-camera-feed-2').srcObject = stream;
+    }).catch(function(e){
+      $('#admin-camera-status-1').textContent = 'Webcam gagal';
+      $('#admin-camera-status-2').textContent = 'Webcam gagal';
+    });
+  }
 }
+startAdminCameras();
 
-function stopAdminCameras() {
-    if (adminVideoStream) {
-        adminVideoStream.getTracks().forEach(track => track.stop());
-        adminVideoStream = null;
-    }
-    const video1 = $('#admin-camera-feed-1');
-    const video2 = $('#admin-camera-feed-2');
-    const status1 = $('#admin-camera-status-1');
-    const status2 = $('#admin-camera-status-2');
-
-    if (video1) video1.srcObject = null;
-    if (video2) video2.srcObject = null;
-    if (status1) status1.textContent = 'Offline';
-    if (status2) status2.textContent = 'Offline';
-}
-
-/* ===================== TARIFF (DUMMY HS CODES) ===================== */
-const TARIFF_RULES = [
-    { prefix: /^73/, name: 'Besi & Konstruksi', dutyRate: 0.075 },
-    { prefix: /^84/, name: 'Mesin/Laptop', dutyRate: 0.05 },
-    { prefix: /^24/, name: 'Tembakau', dutyRate: 0.15 },
-    { prefix: /^85/, name: 'Elektronik', dutyRate: 0.10 },
-    { prefix: /^\d{2}/, name: 'Lain-lain', dutyRate: 0.07 }
-];
-const getTariffRule = (hs) => TARIFF_RULES.find(r => r.prefix.test(String(hs).slice(0, 2))) || TARIFF_RULES.at(-1);
-
-/* ===================== PAJAK (LOGIC DARI PAJAK.PY) ===================== */
-function calculateTaxForItem(item, punyaNpwp) {
-    const cif = Number(item.fob || 0) + Number(item.freight || 0) + Number(item.insurance || 0);
-    const rule = getTariffRule(item.hs);
-    const beaMasuk = cif * rule.dutyRate;
-    const dpp = cif + beaMasuk;
-    const ppn = dpp * 0.11;
-    const tarifPph = punyaNpwp ? 0.025 : 0.075;
-    const pph = dpp * tarifPph;
-    const totalPajak = beaMasuk + ppn + pph;
-    return { cif, beaMasuk, ppn, pph, totalPajak };
-}
-
-function updateContainerTotalTax(container) {
-    let totalTax = 0;
-    let totalCIF = 0;
-    const punyaNpwp = container.punyaNpwp;
-    for (const item of container.lineItems) {
-        const taxResult = calculateTaxForItem(item, punyaNpwp);
-        item.calculatedTax = taxResult;
-        totalTax += taxResult.totalPajak;
-        totalCIF += taxResult.cif;
-    }
-    container.totalTax = totalTax;
-    container.totalCIF = totalCIF;
-}
-
-/* ===================== LOGIN & NAVIGATION ===================== */
-$('#btn-login').addEventListener('click', () => {
-    const pickedRole = $('.chip[aria-pressed="true"]')?.dataset.role;
-    if (!pickedRole) { alert('Pilih peran terlebih dahulu.'); return; }
-    localStorage.setItem(KEYS.role, pickedRole);
-    applyRole();
+// Simulasi OCR valid
+$('#btn-simulate-ocr-valid').addEventListener('click', () => {
+  const db = DB_CONTAINERS[0];
+  const pajak = hitungPajakImpor({
+    fob_usd: 5000,
+    freight_usd: 500,
+    insurance_usd: 50,
+    tarif_bea_masuk: 0.05,
+    kurs_pajak: 16000,
+    biaya_clearance: 150,
+    biaya_trucking: 100,
+    biaya_storage: 75,
+    punya_npwp: true
+  });
+  const item = {
+    id: 'ID' + Math.random().toString(36).slice(2, 9),
+    number: db.number,
+    truck: db.truck,
+    status: 'ocr_valid',
+    pajak: pajak,
+    log: [{ time: new Date().toISOString(), message: 'OCR berhasil, data valid. Palang Gate 1 terbuka otomatis.' }]
+  };
+  const items = getItems();
+  items.push(item);
+  setItems(items);
+  renderAdminTable();
 });
 
+// Simulasi OCR tidak valid
+$('#btn-simulate-ocr-invalid').addEventListener('click', () => {
+  const pajak = hitungPajakImpor({
+    fob_usd: 4000,
+    freight_usd: 400,
+    insurance_usd: 40,
+    tarif_bea_masuk: 0.05,
+    kurs_pajak: 16000,
+    biaya_clearance: 100,
+    biaya_trucking: 80,
+    biaya_storage: 50,
+    punya_npwp: false
+  });
+  const item = {
+    id: 'ID' + Math.random().toString(36).slice(2, 9),
+    number: 'TEMU 654321 1',
+    truck: 'F 4321 DEF',
+    status: 'ocr_invalid',
+    pajak: pajak,
+    log: [{ time: new Date().toISOString(), message: 'OCR gagal/tidak lengkap. Truk berhenti di Gate Utama.' }]
+  };
+  const items = getItems();
+  items.push(item);
+  setItems(items);
+  renderAdminTable();
+});
+
+// Barcode modal logic
+window.showBarcodeModal = function(id) {
+  $('#barcode-modal').classList.remove('hide');
+  $('#barcode-modal').dataset.id = id;
+}
+$('#btn-barcode-cancel').addEventListener('click', () => {
+  $('#barcode-modal').classList.add('hide');
+  $('#barcode-input').value = '';
+});
+$('#btn-barcode-validate').addEventListener('click', () => {
+  const id = $('#barcode-modal').dataset.id;
+  const code = $('#barcode-input').value.trim();
+  if (!code) { alert('Masukkan kode barcode!'); return; }
+  const items = getItems();
+  const item = items.find(it => it.id === id);
+  // Barcode valid jika cocok dengan salah satu DB_CONTAINERS
+  const valid = DB_CONTAINERS.some(db => db.number === item.number && db.truck === item.truck);
+  if (valid) {
+    item.status = 'manual_valid';
+    item.log.push({ time: new Date().toISOString(), message: 'Barcode valid, palang Gate Utama terbuka.' });
+  } else {
+    item.log.push({ time: new Date().toISOString(), message: 'Barcode tidak valid, akses ditolak.' });
+  }
+  setItems(items);
+  $('#barcode-modal').classList.add('hide');
+  $('#barcode-input').value = '';
+  renderAdminTable();
+});
+
+// Tambahkan di dalam <script> sebelum renderAdminTable
+function hitungPajakImpor({
+  fob_usd,
+  freight_usd,
+  insurance_usd,
+  tarif_bea_masuk,
+  tarif_ppn = 0.11,
+  tarif_pph_npwp = 0.025,
+  kurs_pajak = 16000,
+  punya_npwp = true,
+  biaya_clearance = 0,
+  biaya_trucking = 0,
+  biaya_storage = 0
+}) {
+  const cif = fob_usd + freight_usd + insurance_usd;
+  const bea_masuk = cif * tarif_bea_masuk;
+  const dpp = cif + bea_masuk;
+  const ppn = dpp * tarif_ppn;
+  const tarif_pph = punya_npwp ? tarif_pph_npwp : 0.075;
+  const pph_22 = dpp * tarif_pph;
+  const total_pajak = bea_masuk + ppn + pph_22;
+  const landed_cost_usd = cif + total_pajak + biaya_clearance + biaya_trucking + biaya_storage;
+  const landed_cost_idr = landed_cost_usd * kurs_pajak;
+  return {
+    "CIF (USD)": cif,
+    "Bea Masuk (USD)": bea_masuk,
+    "DPP (USD)": dpp,
+    "PPN (USD)": ppn,
+    "PPh 22 (USD)": pph_22,
+    "Total Pajak (USD)": total_pajak,
+    "Total Landed Cost (USD)": landed_cost_usd,
+    "Total Landed Cost (IDR)": landed_cost_idr
+  };
+}
+
+// Render tabel admin
+function renderAdminTable() {
+  const items = getItems();
+  const tbody = $('#admin-table-body');
+  tbody.innerHTML = '';
+  items.forEach(item => {
+    let statusText = '';
+    let aksiBtn = '';
+    if (item.status === 'ocr_valid') {
+      statusText = '<span class="badge ok">Lolos OCR (Gate 1 terbuka)</span>';
+      aksiBtn = '-';
+    } else if (item.status === 'ocr_invalid') {
+      statusText = '<span class="badge err">Gagal OCR (Scan Barcode)</span>';
+      aksiBtn = `<button class="btn small ok" onclick="showBarcodeModal('${item.id}')">Scan Barcode</button>`;
+    } else if (item.status === 'manual_valid') {
+      statusText = '<span class="badge ok">Barcode Valid (Gate 2 terbuka)</span>';
+      aksiBtn = '-';
+    }
+    // Pajak info
+    let pajakHtml = '';
+    if (item.pajak) {
+      pajakHtml = Object.entries(item.pajak).map(([k, v]) => `<div>${k}: <b>${v.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</b></div>`).join('');
+    }
+    const logHtml = item.log.map(l => `<div>${new Date(l.time).toLocaleString()}<br>${l.message}</div>`).join('');
+    tbody.innerHTML += `<tr>
+      <td>${item.number}</td>
+      <td>${item.truck}</td>
+      <td>${statusText}</td>
+      <td>${aksiBtn}</td>
+      <td>${logHtml}${pajakHtml ? '<hr>'+pajakHtml : ''}</td>
+    </tr>`;
+  });
+}
+renderAdminTable();
+
+// Logout
 $('#btn-logout').addEventListener('click', () => {
-    localStorage.removeItem(KEYS.role);
-    applyRole(true);
+  localStorage.removeItem(KEYS.items);
+  location.reload();
 });
-
-$$('.chip').forEach(ch => {
-    ch.addEventListener('click', () => {
-        $$('.chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
-        ch.setAttribute('aria-pressed', 'true');
-    });
-});
-
-function selectTab(targetSel) {
-    $$('.tab-btn').forEach(b => b.setAttribute('aria-selected', b.getAttribute('data-target') === targetSel));
-    $$('.panel').forEach(p => p.classList.toggle('hide', '#' + p.id !== targetSel));
-}
-
-function applyRole(reset = false) {
-    stopAdminCameras(); // Selalu matikan kamera saat ganti role
-    const role = reset ? null : localStorage.getItem(KEYS.role);
-    $('#tab-admin').disabled = role !== 'admin';
-    $('#tab-operator').disabled = role !== 'operator';
-
-    if (role === 'admin') {
-        selectTab('#admin');
-        startAdminCameras(); // Nyalakan kamera untuk admin
-    } else if (role === 'operator') {
-        selectTab('#operator');
-    } else {
-        selectTab('#login');
-    }
-    renderAll();
-}
-
-/* ===================== ADMIN: LCL ITEM MANAGEMENT ===================== */
-let currentLineItems = [];
-
-function renderLineItemInputs() {
-    const container = $('#line-item-list');
-    container.innerHTML = '';
-    currentLineItems.forEach((item, index) => {
-        container.innerHTML += `
-            <div class="item-entry" data-index="${index}">
-                <div class="item-grid">
-                    <div>
-                        <label class="label">HS Code</label>
-                        <input type="text" class="input line-hs" value="${item.hs}" placeholder="Misal: 847150">
-                    </div>
-                    <div>
-                        <label class="label">Nama Barang</label>
-                        <input type="text" class="input line-name" value="${item.name}" placeholder="Laptop/Besi/dll">
-                    </div>
-                    <div>
-                        <label class="label">FOB (USD)</label>
-                        <input type="number" class="input line-fob" value="${item.fob}" placeholder="5000">
-                    </div>
-                    <div>
-                        <label class="label">Freight (USD)</label>
-                        <input type="number" class="input line-freight" value="${item.freight}" placeholder="500">
-                    </div>
-                    <div>
-                        <label class="label">Insurance (USD)</label>
-                        <input type="number" class="input line-insurance" value="${item.insurance}" placeholder="50">
-                    </div>
-                    <div>
-                        <button class="btn err small" onclick="removeLineItem(${index})" style="margin-top: 24px;">Hapus Item</button>
-                    </div>
-                </div>
-            </div>`;
-    });
-}
-
-function addLineItem() {
-    currentLineItems.push({ hs: '', name: '', fob: '', freight: '', insurance: '' });
-    renderLineItemInputs();
-}
-
-window.removeLineItem = (index) => {
-    currentLineItems.splice(index, 1);
-    renderLineItemInputs();
-}
-
-$('#btn-add-line-item').addEventListener('click', addLineItem);
-
-/* ===================== ADMIN: WORKFLOW ACTIONS ===================== */
-$('#btn-save-container').addEventListener('click', () => {
-    const containerNum = $('#f-container-num').value.trim();
-    const truckNum = $('#f-truck-num').value.trim();
-    const punyaNpwp = $('#f-npwp').checked;
-    if (!containerNum || !truckNum) { alert("Nomor Kontainer dan Nomor Polisi Truk wajib diisi."); return; }
-
-    const lineItemElements = $$('#line-item-list .item-entry');
-    const lineItems = lineItemElements.map(el => ({
-        hs: el.querySelector('.line-hs').value,
-        name: el.querySelector('.line-name').value,
-        fob: el.querySelector('.line-fob').value,
-        freight: el.querySelector('.line-freight').value,
-        insurance: el.querySelector('.line-insurance').value,
-    }));
-    if (lineItems.length === 0) { alert("Minimal harus ada 1 item barang di dalam kontainer."); return; }
-
-    const container = {
-        id: uid(), number: containerNum, truck: truckNum, punyaNpwp: punyaNpwp,
-        lineItems: lineItems, status: 'pending_gate1_approval',
-        log: [{ time: new Date().toISOString(), message: "Data pre-registrasi/manual input." }]
-    };
-    updateContainerTotalTax(container);
-
-    const allItems = getItems();
-    allItems.push(container);
-    setItems(allItems);
-    resetInputForm();
-    renderAll();
-});
-
-function resetInputForm() {
-    $('#f-container-num').value = '';
-    $('#f-truck-num').value = '';
-    currentLineItems = [];
-    renderLineItemInputs();
-    addLineItem(); // Re-add one blank item form
-}
-
-$('#btn-simulate-arrival').addEventListener('click', () => {
-    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
-    const containerPrefix = ['MSCU', 'CAIU', 'TEMU', 'SEGU'][randomSuffix % 4];
-    const truckPrefix = ['B', 'D', 'L', 'F'][randomSuffix % 3];
-    const containerNum = `${containerPrefix} ${randomSuffix} ${randomSuffix % 10}`;
-    const truckNum = `${truckPrefix} ${randomSuffix % 1000} XYZ`;
-    const punyaNpwp = Math.random() > 0.3;
-    const lineItems = [];
-    const itemCount = Math.random() > 0.6 ? 2 : 1;
-    const hsCodes = ['730890', '847150', '850110'];
-    for(let i=0; i<itemCount; i++) {
-        const hs = hsCodes[Math.floor(Math.random() * hsCodes.length)];
-        lineItems.push({
-            hs: hs, name: getTariffRule(hs).name,
-            fob: Math.floor(Math.random() * 10000) + 5000,
-            freight: Math.floor(Math.random() * 1000) + 200,
-            insurance: Math.floor(Math.random() * 100) + 10,
-        });
-    }
-    const container = {
-        id: uid(), number: containerNum, truck: truckNum, punyaNpwp: punyaNpwp,
-        lineItems: lineItems, status: 'pending_gate1_approval',
-        log: [{ time: new Date().toISOString(), message: "Data diterima dari OCR Gate 1." }]
-    };
-    updateContainerTotalTax(container);
-    const allItems = getItems();
-    allItems.push(container);
-    setItems(allItems);
-    renderAll();
-});
-
-// Dummy database untuk validasi OCR
-const DB_CONTAINERS = [
-    { number: "MSCU 123456 7", truck: "B 1234 XYZ" },
-    // Tambahkan data lain sesuai kebutuhan
-];
-
-// Fungsi validasi OCR
-function isOcrValid(container) {
-    return DB_CONTAINERS.some(db =>
-        db.number === container.number && db.truck === container.truck
-    );
-}
-
-// Modifikasi approveGate1 agar otomatis lolos jika OCR valid
-window.approveGate1 = (id) => {
-    const items = getItems();
-    const item = items.find(it => it.id === id);
-    if (!item) return;
-    if (isOcrValid(item)) {
-        item.status = 'completed';
-        item.log.push({ time: new Date().toISOString(), message: "OCR valid, semua tahap lolos. Siap kirim/ambil." });
-    } else {
-        item.status = 'approved_for_gate2';
-        item.log.push({ time: new Date().toISOString(), message: "Validasi Admin OK. Menunggu Gate 2." });
-    }
-    setItems(items);
-    renderAll();
-};
-
-/* ===================== OPERATOR: WORKFLOW ACTIONS ===================== */
-window.resolveMismatch = (id) => {
-    alert("Simulasi Scan QR Code Surat Jalan...\nMemverifikasi data dengan sistem...");
-    const items = getItems();
-    const item = items.find(it => it.id === id);
-    if (!item) return;
-    item.status = 'awaiting_physical_check';
-    item.log.push({ time: new Date().toISOString(), message: "Mismatch diselesaikan oleh Operator via QR scan." });
-    setItems(items);
-    renderAll();
-};
-
-let currentOperatorPick = null;
-window.pickForPhysicalCheck = (id) => {
-    const items = getItems();
-    const item = items.find(it => it.id === id);
-    currentOperatorPick = id;
-    $('#op-picked').value = `${item.number} / ${item.truck}`;
-    $('#operator-form').classList.remove('hide');
-    $('#op-note').value = '';
-};
-
-$('#op-submit').addEventListener('click', () => {
-    if (!currentOperatorPick) return;
-    const items = getItems();
-    const item = items.find(it => it.id === currentOperatorPick);
-    item.status = 'completed';
-    item.physicalNote = $('#op-note').value || "Pemeriksaan fisik selesai, tidak ada catatan.";
-    item.log.push({ time: new Date().toISOString(), message: "Pemeriksaan fisik selesai.", note: item.physicalNote });
-    setItems(items);
-    currentOperatorPick = null;
-    $('#operator-form').classList.add('hide');
-    renderAll();
-});
-
-$('#op-reject').addEventListener('click', () => {
-    if (!currentOperatorPick) return;
-    const items = getItems();
-    const item = items.find(it => it.id === currentOperatorPick);
-    item.status = 'rejected';
-    item.physicalNote = $('#op-note').value || "Barang tidak sesuai, akses ditolak.";
-    item.log.push({ time: new Date().toISOString(), message: "Pemeriksaan fisik: Barang tidak sesuai, akses ditolak.", note: item.physicalNote });
-    setItems(items);
-    currentOperatorPick = null;
-    $('#operator-form').classList.add('hide');
-    renderAll();
-});
-
-/* ===================== RENDER TABLES ===================== */
-function renderAdminTables() {
-    const items = getItems();
-    const q1 = $('#tbl-gate1-queue tbody');
-    const q2 = $('#tbl-gate2-queue tbody');
-    const q3 = $('#tbl-physical-check tbody');
-    q1.innerHTML = ''; q2.innerHTML = ''; q3.innerHTML = '';
-
-    items.forEach(it => {
-        const itemDetails = `${it.lineItems.length} item${it.lineItems.length > 1 ? 's' : ''} (Pajak: ${fmtIDR(it.totalTax)})`;
-        switch (it.status) {
-            case 'pending_gate1_approval':
-                q1.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td>${itemDetails}</td>
-                    <td><button class="btn small ok" onclick="approveGate1('${it.id}')">Validasi</button></td></tr>`;
-                break;
-            case 'approved_for_gate2':
-                q2.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td>${itemDetails}</td>
-                    <td><button class="btn small" onclick="simulateGate2Entry('${it.id}')">Simulasi Tiba</button></td></tr>`;
-                break;
-            case 'awaiting_physical_check':
-                q3.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td><span class="badge warn">Menunggu Cek</span></td><td>${fmtIDR(it.totalTax)}</td></tr>`;
-                break;
-            case 'completed':
-                 q3.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td><span class="badge ok">Selesai</span></td><td>${fmtIDR(it.totalTax)}</td></tr>`;
-                break;
-            case 'rejected':
-                q3.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td><span class="badge err">Ditolak</span></td><td>-</td></tr>`;
-                break;
-        }
-    });
-    if (!q1.innerHTML) q1.innerHTML = `<tr><td colspan="4" class="muted">Tidak ada antrian.</td></tr>`;
-    if (!q2.innerHTML) q2.innerHTML = `<tr><td colspan="4" class="muted">Tidak ada antrian.</td></tr>`;
-    if (!q3.innerHTML) q3.innerHTML = `<tr><td colspan="4" class="muted">Tidak ada data.</td></tr>`;
-}
-
-function renderOperatorTables() {
-    const items = getItems();
-    const mismatchTable = $('#tbl-mismatch tbody');
-    const checkTable = $('#tbl-operator-check tbody');
-    mismatchTable.innerHTML = ''; checkTable.innerHTML = '';
-
-    items.forEach(it => {
-        if (it.status === 'mismatch_at_gate2') {
-            mismatchTable.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td><td>${it.errorNote}</td>
-                <td><button class="btn small warn" onclick="resolveMismatch('${it.id}')">Scan QR & Atasi</button></td></tr>`;
-        } else if (it.status === 'awaiting_physical_check') {
-             checkTable.innerHTML += `<tr><td>${it.number}</td><td>${it.truck}</td>
-                <td><button class="btn small" onclick="pickForPhysicalCheck('${it.id}')">Pilih Cek</button></td></tr>`;
-        }
-    });
-    if (!mismatchTable.innerHTML) mismatchTable.innerHTML = `<tr><td colspan="4" class="muted">Tidak ada mismatch.</td></tr>`;
-    if (!checkTable.innerHTML) checkTable.innerHTML = `<tr><td colspan="3" class="muted">Tidak ada tugas cek fisik.</td></tr>`;
-}
-
-function renderAll() {
-    renderAdminTables();
-    renderOperatorTables();
-}
-
-/* ===================== INIT ===================== */
-(function init() {
-    applyRole();
-    resetInputForm(); // Panggil reset untuk menginisialisasi form input LCL saat load
-})();
 </script>
 </body>
 </html>

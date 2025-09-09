@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prototype GATEGO</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h2 { color: #333; }
+    .container { display: flex; gap: 30px; }
+    .card {
+      flex: 1;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    label { display: block; margin-top: 10px; }
+    input, select, button {
+      width: 100%; padding: 8px; margin-top: 5px;
+      border: 1px solid #ccc; border-radius: 5px;
+    }
+    button { background: #007BFF; color: white; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .status-ready { color: green; font-weight: bold; }
+    .status-pending { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>Prototype Sistem GATEGO (OCR + Pajak + Pelindo)</h1>
+  <div class="container">
+    <!-- FORM PT -->
+    <div class="card">
+      <h2>Form PT (Privat Pajak)</h2>
+      <label>Nomor Kontainer:</label>
+      <input type="text" id="noKontainer">
+
+      <label>FOB (USD):</label>
+      <input type="number" id="fob">
+
+      <label>Freight (USD):</label>
+      <input type="number" id="freight">
+
+      <label>Insurance (USD):</label>
+      <input type="number" id="insurance">
+
+      <label>Tarif Bea Masuk (%):</label>
+      <input type="number" id="tarif" value="5">
+
+      <button onclick="hitungPajak()">Hitung Pajak</button>
+      <p id="hasilPajak"></p>
+    </div>
+
+    <!-- FORM PELINDO -->
+    <div class="card">
+      <h2>Form Pelindo (Operasional)</h2>
+      <p><strong>Nomor Kontainer:</strong> <span id="pelindoNo">-</span></p>
+      <p><strong>Status Pajak:</strong> <span id="pelindoStatus" class="status-pending">Pending</span></p>
+      <p><strong>Tonase:</strong> <span id="tonase">-</span></p>
+      <p><strong>Lokasi Yard:</strong> Blok C7</p>
+    </div>
+  </div>
+
+  <!-- CEK STATUS SUPIR -->
+  <div class="card" style="margin-top:20px;">
+    <h2>Supir - Cek Status</h2>
+    <label>Masukkan Nomor Kontainer:</label>
+    <input type="text" id="cekKontainer">
+    <button onclick="cekStatus()">Cek</button>
+    <p id="statusSupir"></p>
+  </div>
+
+  <script>
+    let kontainerData = { no: "", status: "Pending", tonase: 0 };
+
+    function hitungPajak() {
+      let fob = parseFloat(document.getElementById("fob").value) || 0;
+      let freight = parseFloat(document.getElementById("freight").value) || 0;
+      let insurance = parseFloat(document.getElementById("insurance").value) || 0;
+      let tarif = (parseFloat(document.getElementById("tarif").value) || 0) / 100;
+
+      let cif = fob + freight + insurance;
+      let beaMasuk = cif * tarif;
+      let dpp = cif + beaMasuk;
+      let ppn = dpp * 0.11;
+      let pph22 = dpp * 0.025;
+      let totalPajak = beaMasuk + ppn + pph22;
+
+      let noKontainer = document.getElementById("noKontainer").value;
+      kontainerData = { no: noKontainer, status: "Ready", tonase: cif.toFixed(2) };
+
+      document.getElementById("hasilPajak").innerHTML =
+        `CIF: $${cif.toFixed(2)}<br>Total Pajak: $${totalPajak.toFixed(2)}<br><b>Status: Clear</b>`;
+
+      document.getElementById("pelindoNo").textContent = noKontainer;
+      document.getElementById("pelindoStatus").textContent = "Ready";
+      document.getElementById("pelindoStatus").className = "status-ready";
+      document.getElementById("tonase").textContent = kontainerData.tonase + " kg";
+    }
+
+    function cekStatus() {
+      let cek = document.getElementById("cekKontainer").value;
+      if (cek === kontainerData.no && kontainerData.status === "Ready") {
+        document.getElementById("statusSupir").innerHTML = "✅ Kontainer siap diambil!";
+      } else {
+        document.getElementById("statusSupir").innerHTML = "❌ Kontainer belum clear.";
+      }
+    }
+  </script>
+</body>
+</html>
